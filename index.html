@@ -62,22 +62,36 @@
         });
       } else {
         document.getElementById('status').innerText = 'Thank you! Submitting your feedback...';
-        sendToGoogleSheet();
+        sendToKoBo();
       }
     }
 
-    function sendToGoogleSheet() {
-      fetch('https://script.google.com/macros/s/AKfycby_Q1RxEnvjSOPpLICf-_rG1WK2E8FG3wZauiZ8PSgj0z8ENzdHwxB8LlvA4aWIHD0ceg/exec', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ feedback: feedback })
-      }).then(() => {
-        document.getElementById('status').innerText = 'Feedback submitted successfully!';
-      });
-    }
+    function sendToKoBo() {
+  const payload = {
+    food_rating: feedback[0]?.answer,
+    hygiene_rating: feedback[1]?.answer,
+    price_opinion: feedback[2]?.answer,
+    suggestion: feedback[3]?.answer
+  };
+
+  fetch('https://kc.kobotoolbox.org/api/v1/submissions', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Basic d2lsbGlhbS5hbnRhcjo5NjEzMjQ4MzQ5',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      id: "voice_feedback_form",
+      submission: payload
+    })
+  }).then(() => {
+    document.getElementById('status').innerText = 'Feedback submitted to KoBoToolbox!';
+  }).catch((err) => {
+    console.error(err);
+    document.getElementById('status').innerText = 'Error submitting to KoBoToolbox';
+  });
+}
+
   </script>
 </body>
 </html>
