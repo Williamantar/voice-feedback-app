@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Restaurant Voice Feedback</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+    button { font-size: 18px; padding: 10px 20px; margin-top: 20px; }
+    #status { margin-top: 20px; font-size: 16px; color: green; }
+  </style>
+</head>
+<body>
+  <h1>We'd Love Your Feedback!</h1>
+  <button onclick="startFeedback()">Start Voice Feedback</button>
+  <p id="status"></p>
+
+  <script>
+    const questions = [
+      "How was the food?",
+      "How would you rate the hygiene?",
+      "Was the price reasonable?",
+      "Do you have any suggestions for us?"
+    ];
+
+    const feedback = [];
+    let currentQuestion = 0;
+
+    function speak(text, callback) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.onend = callback;
+      speechSynthesis.speak(utterance);
+    }
+
+    function listen(callback) {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        callback(transcript);
+      };
+      recognition.onerror = (event) => {
+        document.getElementById('status').innerText = 'Error recognizing speech. Please try again.';
+      };
+      recognition.start();
+    }
+
+    function startFeedback() {
+      feedback.length = 0;
+      currentQuestion = 0;
+      askQuestion();
+    }
+
+    function askQuestion() {
+      if (currentQuestion < questions.length) {
+        speak(questions[currentQuestion], () => {
+          listen((response) => {
+            feedback.push({ question: questions[currentQuestion], answer: response });
+            currentQuestion++;
+            askQuestion();
+          });
+        });
+      } else {
+        document.getElementById('status').innerText = 'Thank you! Submitting your feedback...';
+        sendToGoogleSheet();
+      }
+    }
+
+    function sendToGoogleSheet() {
+      fetch('YOUR_GOOGLE_SCRIPT_WEBHOOK_URL', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ feedback: feedback })
+      }).then(() => {
+        document.getElementById('status').innerText = 'Feedback submitted successfully!';
+      });
+    }
+  </script>
+</body>
+</html>
