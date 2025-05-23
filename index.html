@@ -74,23 +74,29 @@
     suggestion: feedback[3]?.answer
   };
 
-  fetch('https://kc.kobotoolbox.org/api/v1/submissions', {
+  fetch('https://kf.kobotoolbox.org/submissions/', {
     method: 'POST',
     headers: {
       'Authorization': 'Basic d2lsbGlhbS5hbnRhcjo5NjEzMjQ4MzQ5',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      id: "voice_feedback_form",
-      submission: payload
+      form_id: "voice_feedback_form",
+      food_rating: payload.food_rating,
+      hygiene_rating: payload.hygiene_rating,
+      price_opinion: payload.price_opinion,
+      suggestion: payload.suggestion
     })
-  }).then(() => {
+  })
+  .then(() => {
     document.getElementById('status').innerText = 'Feedback submitted to KoBoToolbox!';
-  }).catch((err) => {
+  })
+  .catch((err) => {
     console.error(err);
     document.getElementById('status').innerText = 'Error submitting to KoBoToolbox';
   });
 }
+
 
   </script>
 </body>
