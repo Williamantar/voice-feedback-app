@@ -66,18 +66,18 @@
       }
     }
 
-    function sendToGoogleSheet() {
-      fetch(https://script.google.com/macros/s/AKfycbwno21ozNNSmsBSrp7r-e1_vfZ8MiAkDnDdmLF2V4zV0fVMOcM4G4AQPPYa2igoEMCo/exec
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ feedback: feedback })
-      }).then(() => {
-        document.getElementById('status').innerText = 'Feedback submitted successfully!';
-      });
-    }
+   function sendToGoogleSheet() {
+  fetch('https://script.google.com/macros/s/AKfycbwno21ozNNSmsBSrp7r-e1_vfZ8MiAkDnDdmLF2V4zV0fVMOcM4G4AQPPYa2igoEMCo/exec', {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ feedback: feedback })
+  }).then(() => {
+    document.getElementById('status').innerText = 'Feedback submitted successfully!';
+  });
+}
   </script>
 </body>
 </html>
