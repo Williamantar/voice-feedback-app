@@ -5,12 +5,21 @@
   <title>Restaurant Voice Feedback</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-    button { font-size: 18px; padding: 10px 20px; margin-top: 20px; }
+    select, button { font-size: 18px; padding: 10px; margin-top: 20px; }
     #status { margin-top: 20px; font-size: 16px; color: green; }
   </style>
 </head>
 <body>
   <h1>We'd Love Your Feedback!</h1>
+
+  <label for="language">Select Language:</label>
+  <select id="language">
+    <option value="en-US">English</option>
+    <option value="ar-LB">Arabic</option>
+    <option value="fr-FR">French</option>
+  </select>
+
+  <br>
   <button onclick="startFeedback()">Start Voice Feedback</button>
   <p id="status"></p>
 
@@ -27,22 +36,33 @@
 
     function speak(text, callback) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
+      utterance.lang = document.getElementById('language').value;
       utterance.onend = callback;
       speechSynthesis.speak(utterance);
     }
 
     function listen(callback) {
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'en-US';
+      recognition.lang = document.getElementById('language').value;
+
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        callback(transcript);
+        callback(cleanText(transcript));
       };
+
       recognition.onerror = (event) => {
         document.getElementById('status').innerText = 'Error recognizing speech. Please try again.';
       };
+
       recognition.start();
+    }
+
+    function cleanText(text) {
+      const stopWords = ['the', 'is', 'and', 'this', 'that', 'of', 'but', 'to', 'in', 'with', 'for', 'a', 'an'];
+      return text
+        .split(' ')
+        .filter(word => !stopWords.includes(word.toLowerCase()))
+        .join(' ');
     }
 
     function startFeedback() {
